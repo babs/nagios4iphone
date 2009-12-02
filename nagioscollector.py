@@ -5,6 +5,7 @@ from pprint import pprint
 
 RE_Status  = re.compile("'status(OK|WARNING|CRITICAL)'")
 RE_Message = re.compile("<TD CLASS='status[^']+' valign='center'>(.*?)</TD>")
+entity_re  = re.compile("&(#?)(\d{1,5}|\w{1,8});")
 
 
 from htmlentitydefs import name2codepoint as n2cp
@@ -20,7 +21,6 @@ def substitute_entity(match):
 			return match.group()
 
 def decode_htmlentities(string):
-	entity_re = re.compile("&(#?)(\d{1,5}|\w{1,8});")
 	return entity_re.subn(substitute_entity, string)[0]
 
 def fetch_status(nagios_host, username, password, realm='Nagios Access', nagios_version=3):
