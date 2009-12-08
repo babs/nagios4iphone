@@ -4,7 +4,7 @@ import urllib2, urllib, re, urlparse, ConfigParser
 from pprint import pprint
 
 RE_Status  = re.compile("'status(OK|WARNING|CRITICAL)'")
-RE_Message = re.compile("<TD CLASS='status[^']+' valign='center'>(.*?)</TD>")
+RE_Message = re.compile("<TD CLASS='status[^']+'(?: valign='center'| nowrap)?>(.*?)</TD>")
 
 
 from htmlentitydefs import name2codepoint as n2cp
@@ -30,7 +30,7 @@ def fetch_status(nagios_host, username, password, realm='Nagios Access', nagios_
 		nagios_loc = "nagios/cgi-bin/"
 
 	nagios_base = urlparse.urljoin(nagios_host, nagios_loc)
-	print nagios_base
+	# print nagios_base
 	pwdman = urllib2.HTTPBasicAuthHandler()
 	pwdman.add_password(realm, nagios_base, username, password)
 	opener = urllib2.build_opener(pwdman)
@@ -47,15 +47,19 @@ def fetch_status(nagios_host, username, password, realm='Nagios Access', nagios_
 		services = serverel.split("extinfo.cgi?type=2&host=%s&service="%server )[1:]
 		for service in services:
 			if not "</TR></TABLE></TD>" in service: continue
+			# print "-"*50
 			# print service
-			sstatus = RE_Status.findall(service)
+			# print "-"*50
 			sname = urllib.unquote_plus(service.split("'",1)[0])
 			s = services_status.setdefault(server,{}).setdefault(sname, {})
 			s['name']   = urllib.unquote_plus(sname)
-			s['status'] = sstatus[0]
 			msgst = RE_Message.findall(service)
-			if len(msgst) == 1:
-				s['message'] = decode_htmlentities(msgst[0]).strip()
+			if len(msgst) == 5:
+				s['status']    = decode_htmlentities(msgst[0]).strip()
+				s['lastcheck'] = decode_htmlentities(msgst[1]).strip()
+				s['duration']  = decode_htmlentities(msgst[2]).strip()
+				s['attempts']  = decode_htmlentities(msgst[3]).strip()
+				s['message']   = decode_htmlentities(msgst[4]).strip()
 	return services_status
 
 def main():
@@ -64,7 +68,7 @@ def main():
 	AllStatus = {}
 	for s in conf.sections():
 		if conf.has_option(s, 'active') and conf.get(s, 'active') == "1":
-			#try:
+			try:
 				AllStatus[s] = fetch_status(
 					conf.get(s, 'host'),
 					conf.get(s, 'username'),
@@ -72,8 +76,8 @@ def main():
 					realm          = conf.get(s, 'realm'),
 					nagios_version = conf.get(s, 'version')
 					)
-			#except:
-			#	pass
+			except Exception as e:
+				print "Error while fetching %s -> %s"%(conf.get(s, 'host'),str(e))
 	pprint(AllStatus)
 	# fetch_status("https://minnie.neolane.net/","nagiosadmin","NeoNagiosAdmin",nagios_version=3)
 	# fetch_status("https://mickey.neolane.net/","nagiosadmin","NeoNagiosAdmin",nagios_version=3)
