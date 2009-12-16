@@ -1,0 +1,3 @@
+[submodule "bottle"]
+	path = bottle
+	url = git://github.com/babs/bottle.git

@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<link rel="apple-touch-icon" href="iui/iui-logo-touch-icon.png" />
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+<title>Nagios</title>
+<style type="text/css" media="screen">@import "iui/iui.css";@import "css/styles.css";</style>
+<script type="application/x-javascript" src="js/sprintf.js"></script>
+<script type="application/x-javascript" src="iui/iui.js"></script>
+<script type="application/x-javascript" src="js/json_parse.js"></script>
+<script type="application/x-javascript" src="js/nagios.js"></script>
+</head>
+
+<body>
+
+    <div class="toolbar">
+        <h1 id="pageTitle">Nagios</h1>
+        <a id="backButton" class="button" href="#"></a>
+    </div>
+	<div id="home" selected="true" class="panel" title="Nagios">
+		<div class="rw" style="text-align: center;">
+			<h2>Overview</h2>
+			<div style="text-align: left;">
+				Total: <span id="TOTALqty">0</span>
+			</div>
+			<div style="text-align: left;">
+				<div>Ok: <span id="OKqty">0</span></div>
+				<div style="float: left; height: 19px; width: 100%; border: 1px solid black;">
+					<div class="OK" id="OKbar" style="float: left; height: 19px; width: 0%;"></div>
+				</div>
+			</div>
+			<div style="text-align: left;">
+				Warning: <span id="WARNINGqty">0</span>
+				<div style="float: left; height: 19px; width: 100%; border: 1px solid black;">
+					<div class="WARNING" id="WARNINGbar" style="float: left; height: 19px; width: 0%;"></div>
+				</div>
+			</div>
+			<div style="text-align: left;">
+				Critical: <span id="CRITICALqty">0</span>
+				<div style="float: left; height: 19px; width: 100%; border: 1px solid black;">
+					<div class="CRITICAL" id="CRITICALbar" style="float: left; height: 19px; width: 0%;"></div>
+				</div>
+			</div>
+			<div style="text-align: left;">
+				Unknown: <span id="UNKNOWNqty">0</span>
+			</div>
+			<div style="text-align: left;">
+				Pending: <span id="PENDINGqty">0</span>
+			</div>
+			<div class="cb"></div>
+		</div>
+		<ul id="overall_list">
+			<!--<li>
+				<a href="javascript:show_allerrors();spbi('allerrors')">All errors</a>
+			</li>-->
+		</ul>
+	</div>
+
+	<div id="allerrors" class="panel" title="All errors">
+		<ul id="allerrors_ul">
+		</ul>
+	</div>
+
+	<div id="shownagiosserver" class="panel">
+		<div class="rw" style="text-align: center;">
+			<h2 id="ov_sname">Overview</h2>
+			<div style="text-align: left;">
+				Total: <span id="TOTALqtysrv">0</span>
+			</div>
+			<div style="text-align: left;">
+				<div>Ok: <span id="OKqtysrv">0</span></div>
+				<div style="float: left; height: 19px; width: 100%; border: 1px solid black;">
+					<div class="OK" id="OKbarsrv" style="float: left; height: 19px; width: 0%;"></div>
+				</div>
+			</div>
+			<div style="text-align: left;">
+				Warning: <span id="WARNINGqtysrv">0</span>
+				<div style="float: left; height: 19px; width: 100%; border: 1px solid black;">
+					<div class="WARNING" id="WARNINGbarsrv" style="float: left; height: 19px; width: 0%;"></div>
+				</div>
+			</div>
+			<div style="text-align: left;">
+				Critical: <span id="CRITICALqtysrv">0</span>
+				<div style="float: left; height: 19px; width: 100%; border: 1px solid black;">
+					<div class="CRITICAL" id="CRITICALbarsrv" style="float: left; height: 19px; width: 0%;"></div>
+				</div>
+			</div>
+			<div style="text-align: left;">
+				Unknown: <span id="UNKNOWNqtysrv">0</span>
+			</div>
+			<div style="text-align: left;">
+				Pending: <span id="PENDINGqtysrv">0</span>
+			</div>
+			<div class="cb"></div>
+		</div>
+		<ul id="shownagiosserver_ul">
+		</ul>
+	</div>
+	
+	<div id="service_detail" class="panel">
+	</div>
+
+</body>
+</html>

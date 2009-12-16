@@ -44,6 +44,11 @@ class NagiosServers:
 					st[k] =  nserver_status[k]
 		return st
 
+	def as_dict(self):
+		r = {}
+		for e in self.nagiosservers:
+			r[e] = self.nagiosservers[e].as_dict()
+		return r
 
 class NagiosServer:
 	def __init__(self, name, nagios_host, username, password, realm='Nagios Access', nagios_version=3, fetch=0):
@@ -93,6 +98,11 @@ class NagiosServer:
 					st[k] =  server_status[k]
 		return st
 
+	def as_dict(self):
+		r = {}
+		for e in self.servers:
+			r[e.servername] = e.as_dict()
+		return r
 
 class Server:
 	def __init__(self, datas = None):
@@ -120,6 +130,12 @@ class Server:
 				st[service.status] = 1
 		return st
 
+	def as_dict(self):
+		r = {}
+		for e in self.services:
+			r[e.servicename] = e.as_dict()
+		return r
+
 class Service:
 	def __init__(self, datas = None):
 		self.servicename = ""
@@ -144,3 +160,12 @@ class Service:
 
 	def __repr__(self):
 		return "<%s instance for %s>"%(self.__class__, self.servicename)
+
+	def as_dict(self):
+		r = {}
+		r['status']    = self.status
+		r['lastcheck'] = self.lastcheck
+		r['duration']  = self.duration
+		r['attempts']  = self.attempts
+		r['message']   = self.message
+		return r
