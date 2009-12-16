@@ -4,44 +4,96 @@ function loadDatas(aValue) {
 	$('target').innerHTML=aValue;
 }
 var NagiosDatas = "";
-addEventListener("load", function(event) {
-var req = new XMLHttpRequest();
-req.onreadystatechange = function() {
-	if (this.readyState == 4) {
-		NagiosDatas = json_parse(this.responseText);
-		collect_and_update();
-		for (e in NagiosDatas) {
-			var a = document.createElement("a")
-			a.innerHTML=e;
-			a.setAttribute('onclick','loadNagiosServer("'+e+'")');
-			a.setAttribute('href','#shownagiosserver');
-			var li = document.createElement("li");
-			var span = document.createElement('span');
-			var stats = getserverstats(e);
-			span.appendChild(document.createTextNode(
-				sprintf(" (T:%d O:%d W:%d C:%d)", stats['TOTAL'], stats['OK'], stats['WARNING'], stats['CRITICAL'])
-			));
-			//
-			span.style.fontSize = "10pt";
-			a.appendChild(span)
-			li.appendChild(a);
-			$('overall_list').appendChild(li);
+
+load_datas = function (cb) {
+	flushNode($('overall_list'));
+	var req = new XMLHttpRequest();
+	req.onreadystatechange = function() {
+		if (this.readyState == 4) {
+			NagiosDatas = json_parse(this.responseText);
+			collect_and_update();
+			for (e in NagiosDatas) {
+				var a = document.createElement("a")
+				a.appendChild(document.createTextNode(e));
+				a.setAttribute('onclick','loadNagiosServer("'+e+'")');
+				a.setAttribute('href','#shownagiosserver');
+				var li = document.createElement("li");
+				var span = document.createElement('span');
+				var stats = getserverstats(e);
+				span.appendChild(document.createTextNode(
+					sprintf(" (T:%d O:%d W:%d C:%d)", stats['TOTAL'], stats['OK'], stats['WARNING'], stats['CRITICAL'])
+				));
+				//
+				span.style.fontSize = "10pt";
+				a.appendChild(span)
+				li.appendChild(a);
+				$('overall_list').appendChild(li);
+				var b = $('reloadButton');
+				flushNode(b);
+				b.appendChild(document.createTextNode("Reload"));
+				if (cb) {
+					cb();
+				}
+			}
 		}
 	}
+	req.open("GET", "datas.json", true);
+	// Sample
+	//req.open("GET", "js/datas.json", true);
+	req.send(null);
 }
-req.open("GET", "datas.json", true);
-// Sample
-//req.open("GET", "js/datas.json", true);
-req.send(null);
+
+clean_view = function () {
+	var b = $('reloadButton');
+	flushNode(b);
+	b.appendChild(document.createTextNode('Loading ...'));
+	var statusnames = [ 'TOTAL', 'OK', 'WARNING', 'CRITICAL', 'UNKNOWN', 'PENDING' ];
+	for ( i in statusnames ) {
+		if ($(statusnames[i]+'bar')) {
+			$(statusnames[i]+'bar').style.width = "0px";
+		}
+		if ($(statusnames[i]+'barsrv')) {
+			$(statusnames[i]+'barsrv').style.width = "0px";
+		}
+		if ($(statusnames[i]+'qty')) {
+			flushNode($(statusnames[i]+'qty'));
+			$(statusnames[i]+'qty').appendChild(document.createTextNode("0"));
+		}
+		if ($(statusnames[i]+'qtysrv')) {
+			flushNode($(statusnames[i]+'qtysrv'));
+			$(statusnames[i]+'qtysrv').appendChild(document.createTextNode("0"));
+		}
+	}
+	flushNode($('service_detail'));
+	flushNode($('shownagiosserver_ul'));
+}
+
+refresh_view = function () {
+	//var sel = window.iui.getSelectedPage();
+	var b = $('reloadButton');
+	flushNode(b);
+	b.appendChild(document.createTextNode("Reload"));
+	try {
+		eval($('shownagiosserver').getAttribute('onReload'));
+		eval($('service_detail').getAttribute('onReload'));
+		//alert('reloaded');
+	} catch (e) {
+		alert("Error: "+e);
+	}
+}
+
+addEventListener("load", function(event) {
+	load_datas();
 }, false);
 
 loadNagiosServer = function (server) {
 	collect_and_update(server);
 	$('ov_sname').innerHTML = server + " overview"
 	var o = $('shownagiosserver');
+	o.setAttribute('onReload','loadNagiosServer("'+server+'");');
 	o.setAttribute('title',server);
 	var dest_list = $('shownagiosserver_ul');
-	dest_list.innerHTML = "";
+	flushNode(dest_list);
 	var e = server;
 	for ( f in NagiosDatas[e] ) {
 		var sli = document.createElement("li");
@@ -85,6 +137,7 @@ update_service_detail = function (nagiosserver, server, service) {
 	var s = NagiosDatas[nagiosserver][server][service];
 	var dest = $('service_detail');
 	dest.setAttribute('title',sprintf('%s on %s',service, server));
+	dest.setAttribute('onReload', "update_service_detail('"+nagiosserver+"','"+server+"','"+service+"');")
 
 	flushNode(dest);
 	var ul = document.createElement('ul');
