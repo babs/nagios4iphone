@@ -4,10 +4,10 @@ import os, sys
 ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, ROOT)
 
-import urllib2, urllib, re, urlparse, ConfigParser, json
+import urllib2, urllib, re, urlparse, ConfigParser
 from pprint import pprint
 from Nagios import *
-from bottle import route, PasteServer, response, request, run, send_file
+from bottle import route, PasteServer, response, request, run, send_file, app
 
 import __builtin__
 
@@ -50,7 +50,7 @@ def generate_json():
 	serverpool.update()
 	#pprint(serverpool.overall_status())
 	#pprint(serverpool.as_dict())
-	return json.dumps(serverpool.as_dict())
+	return serverpool.as_dict()
 
 def main():
 	run(host="0.0.0.0")
@@ -61,5 +61,5 @@ if __name__ == "__main__":
 else:
 	# Mod WSGI launch
 	os.chdir(ROOT)
-	application = default_app()
+	application = app()
 
