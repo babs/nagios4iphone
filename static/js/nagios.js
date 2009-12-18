@@ -5,6 +5,15 @@ function loadDatas(aValue) {
 }
 var NagiosDatas = "";
 
+getSortedKeys = function ( anArray) {
+	var keys = [];
+	for ( var k in anArray ) {
+		keys.push(k);
+	}
+	keys.sort()
+	return keys;
+}
+
 load_datas = function (cb) {
 	flushNode($('overall_list'));
 	var req = new XMLHttpRequest();
@@ -12,7 +21,9 @@ load_datas = function (cb) {
 		if (this.readyState == 4) {
 			NagiosDatas = json_parse(this.responseText);
 			collect_and_update();
-			for (e in NagiosDatas) {
+			ke = getSortedKeys(NagiosDatas)
+			for (var i in ke) {
+				var e = ke[i];
 				var a = document.createElement("a")
 				a.appendChild(document.createTextNode(e));
 				a.setAttribute('onclick','loadNagiosServer("'+e+'")');
@@ -95,14 +106,18 @@ loadNagiosServer = function (server) {
 	var dest_list = $('shownagiosserver_ul');
 	flushNode(dest_list);
 	var e = server;
-	for ( f in NagiosDatas[e] ) {
+	kf = getSortedKeys(NagiosDatas[e])
+	for (var i in kf) {
+		var f = kf[i];
 		var sli = document.createElement("li");
 		sli.appendChild(document.createTextNode(f+":"));
 		var container = document.createElement('div');
 		
 		container.style.marginLeft = "10px";
 		container.className = "service_listing";
-		for ( g in NagiosDatas[e][f] ) {
+		kg = getSortedKeys(NagiosDatas[e][f])
+		for (var i in kg) {
+			var g = kg[i];
 			if ( NagiosDatas[e][f][g]["status"] == "OK" ) continue;
 			var service = document.createElement("div");
 			
@@ -227,7 +242,6 @@ getserverstats = function (srv) {
 		}
 	}
 	return r;
-
 }
 
 collect_and_update = function (srv) {
